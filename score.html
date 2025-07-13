@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Game Over</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-color: #d2f5e3;
+      text-align: center;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .page {
+      max-width: 1000px;
+      margin: auto;
+      padding: 20px;
+      background: #ffffff;
+      border: 5px solid #333;
+      border-radius: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.2);
+    }
+
+    h1 {
+      font-size: 2rem;
+    }
+
+    h2 {
+      margin-top: 30px;
+      font-size: 1.5rem;
+      border-bottom: 2px solid #ccc;
+      padding-bottom: 5px;
+    }
+
+    .score-summary {
+      font-size: 1.1rem;
+      margin-top: 10px;
+    }
+
+    .answers-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 15px;
+      margin-top: 15px;
+      justify-items: center;
+    }
+
+    .answer-item {
+      border: 2px solid #ccc;
+      border-radius: 12px;
+      padding: 10px;
+      font-size: 0.9rem;
+      background: #f9f9f9;
+      width: 100%;
+      box-sizing: border-box;
+      text-align: center;
+    }
+
+    .correct {
+      border-color: #4CAF50;
+      background-color: #e7f9ed;
+    }
+
+    .wrong {
+      border-color: #f44336;
+      background-color: #ffecec;
+    }
+
+    .answer-item img {
+      width: 60px;
+      height: auto;
+      margin: 5px 0;
+      border-radius: 6px;
+    }
+
+    button {
+      padding: 10px 20px;
+      font-family: Poppins, sans-serif;
+      font-size: 1rem;
+      margin: 10px 10px 0;
+      border: none;
+      border-radius: 10px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #45a049;
+    }
+
+    /* Modal styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 10;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.5);
+    }
+
+    .modal-content {
+      background-color: #ffffff;
+      margin: 10% auto;
+      padding: 20px 30px;
+      border-radius: 20px;
+      max-width: 500px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+      position: relative;
+      text-align: center;
+    }
+
+    .close-btn {
+      color: #aaa;
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      font-size: 30px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .close-btn:hover {
+      color: #000;
+    }
+
+    #difficultyModal .btn {
+      background-color: #2196F3; 
+      border: none;
+      color: white;
+    }
+
+    #difficultyModal .btn:hover {
+      background-color: #1976D2;
+    }
+
+  </style>
+</head>
+<body>
+
+  <audio id="celebrate-sound" src="yay.mp3" preload="auto"></audio>
+
+  <div class="page">
+    <h1 id="end-message">⏱️ Game Over</h1>
+    <p class="score-summary" id="final-score"></p>
+    <p class="score-summary" id="lives-left"></p>
+    <p class="score-summary" id="time-left"></p>
+
+    <h2>✅ Correct Answers</h2>
+    <div class="answers-grid" id="correct-list"></div>
+
+    <h2>❌ Wrong Answers</h2>
+    <div class="answers-grid" id="wrong-list"></div>
+
+    <button onclick="goToStart()">🏠 Go to Start Page</button>
+    <button onclick="playAgain()">🔁 Try Again</button>
+    <button onclick="changeDifficulty()">🎯 Change Difficulty</button>
+  </div>
+
+  <!-- Difficulty Modal -->
+  <div id="difficultyModal" class="modal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="closeDifficultyModal()">&times;</span>
+      <h2>Select Difficulty</h2>
+      <div style="display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; margin-top: 20px;">
+        <button class="btn" onclick="chooseDifficulty('easy')">Easy</button>
+        <button class="btn" onclick="chooseDifficulty('medium')">Medium</button>
+        <button class="btn" onclick="chooseDifficulty('hard')">Hard</button>
+      </div>
+      <p style="margin-top: 20px;">Pick a new challenge and go again!</p>
+    </div>
+  </div>
+
+  <script>
+    function goToStart() {
+      localStorage.removeItem("playerName");
+      localStorage.removeItem("difficulty");
+      localStorage.removeItem("gameSummary");
+      window.location.href = "menu.html";
+    }
+
+    function playAgain() {
+    const difficulty = localStorage.getItem("difficulty");
+
+    localStorage.setItem("playLevelSound", "true");
+
+  // safety check in case difficulty is missing
+  if (!difficulty) {
+    alert("Difficulty not set! Going back to menu.");
+    window.location.href = "menu.html";
+    return;
+  }
+
+  // go back to the correct level
+  if (difficulty === "easy") {
+    window.location.href = "easy.html";
+  } else if (difficulty === "medium") {
+    window.location.href = "medium.html";
+  } else if (difficulty === "hard") {
+    window.location.href = "hard.html";
+  } else {
+    window.location.href = "menu.html";
+  }
+}
+
+    function changeDifficulty() {
+      localStorage.removeItem("gameSummary");
+      openDifficultyModal();
+      localStorage.setItem("playLevelSound", "true");
+    }
+
+    function chooseDifficulty(level) {
+      localStorage.setItem("difficulty", level);
+      if (level === "easy") {
+        window.location.href = "easy.html";
+      } else if (level === "medium") {
+        window.location.href = "medium.html";
+      } else if (level === "hard") {
+        window.location.href = "hard.html";
+      }
+    }
+
+    function openDifficultyModal() {
+      document.getElementById("difficultyModal").style.display = "block";
+    }
+
+    function closeDifficultyModal() {
+      document.getElementById("difficultyModal").style.display = "none";
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById("difficultyModal");
+      if (event.target === modal) {
+        modal.style.display = "none";
+      }
+    }
+
+    window.onload = () => {
+
+      const celebrate = document.getElementById("celebrate-sound");
+      celebrate.volume = 0.7; // optional volume control
+      celebrate.play().catch(() => {
+      // If browser blocks autoplay, ignore the error
+      console.log("Autoplay blocked. Sound will not play without user interaction.");
+    });
+
+      const summary = JSON.parse(localStorage.getItem("gameSummary"));
+
+      if (!summary) {
+        document.getElementById("final-score").innerText = "No game data found.";
+        return;
+      }
+
+      const { score, lives, timeLeft, correctAnswers, wrongAnswers } = summary;
+      const completed = correctAnswers.length + wrongAnswers.length >= 16;
+
+      if (completed && lives > 0 && timeLeft > 0) {
+        document.getElementById("end-message").innerText = "🎉 You completed all levels!";
+      }
+
+      const rawName = localStorage.getItem("playerName") || "Player";
+      const playerName = capitalize(rawName);
+      document.getElementById("final-score").innerText =
+        `${playerName}'s Final Score: ${score} | ✅ ${correctAnswers.length} Correct | ❌ ${wrongAnswers.length} Wrong`;
+
+      document.getElementById("lives-left").innerText = `❤️ Lives Left: ${lives}`;
+      document.getElementById("time-left").innerText = `⏳ Time Left: ${timeLeft}s`;
+
+      const correctList = document.getElementById("correct-list");
+      correctAnswers.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "answer-item correct";
+        div.innerHTML = `
+          <strong>${item.country}</strong><br>
+          <img src="https://flagcdn.com/w80/${item.code}.png" alt="${item.country}"><br>
+          ${capitalize(item.capital)}
+        `;
+        correctList.appendChild(div);
+      });
+
+      const wrongList = document.getElementById("wrong-list");
+      wrongAnswers.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "answer-item wrong";
+
+        const userFlagImg = item.userFlag
+          ? `<img src="https://flagcdn.com/w80/${item.userFlag}.png" alt="Your flag">`
+          : `<span>❌ No flag selected</span>`;
+
+        div.innerHTML = `
+          <strong>${item.country}</strong><br>
+          ${userFlagImg}<br>
+          <small><em>Your: ${item.userAnswer ? capitalize(item.userAnswer) : "❌ None"}</em></small><br>
+          <img src="https://flagcdn.com/w80/${item.code}.png" alt="Correct flag"><br>
+          <small><em>Correct: ${capitalize(item.capital)}</em></small>
+        `;
+        wrongList.appendChild(div);
+      });
+    };
+
+    function capitalize(str) {
+    return str
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+    .join(' ');
+  }
+  
+  </script>
+</body>
+</html>

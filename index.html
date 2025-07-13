@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Index - Flags Ahoy!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-image: url('background.png');
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      text-align: center;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .game-title {
+      font-size: 3rem;
+      font-weight: 800;
+      color: #ffffff;
+      text-shadow: 2px 2px 4px #2c2c2c;
+      margin-bottom: 20px;
+    }
+
+    .box {
+      background-color: #3F7777;
+      padding: 20px 50px;
+      border-radius: 20px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+      text-align: center;
+      width: 420px;
+    }
+
+    .box h2 {
+      font-size: 1.8rem;
+      color: #fff;
+      margin-top: 10px;
+      margin-bottom: 10px;
+    }
+
+    .box p {
+      color: #e0e0e0;
+      margin-bottom: 20px;
+    }
+
+    input[type="text"] {
+      padding: 10px;
+      width: 80%;
+      border-radius: 10px;
+      border: none;
+      margin-bottom: 10px;
+      font-family: Poppins, sans-serif;
+      font-size: 1rem;
+      text-align: center;
+    }
+
+    input[type="text"]:hover {
+      border: 2px solid black;
+    }
+
+    .btn {
+      display: block;
+      justify-content: center;
+      width: 80%;
+      padding: 12px;
+      font-size: 1rem;
+      border: 3px solid #634f37;
+      border-radius: 12px;
+      background-color: #b89262;
+      color: black;
+      font-family: Poppins, sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      margin: 10px auto;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn:hover {
+      background-color: #dec09c;
+    }
+
+    .footer {
+      margin-top: 30px;
+      font-size: 0.9rem;
+      color: #444;
+    }
+
+    /* Custom Popup */
+    #namePopup {
+      display: none;
+      background-color: #fff;
+      color: #333;
+      padding: 15px 25px;
+      border-radius: 10px;
+      position: fixed;
+      top: 20%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1000;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti-canvas" style="position: fixed; top: 0; left: 0; pointer-events: none; width: 100%; height: 100%; z-index: 999;"></canvas>
+
+<div class="game-title">Flags Ahoy!</div>
+
+<div class="box">
+  <h2 id="welcomeTitle">Hello!</h2>
+  <script src="https://cdn.lordicon.com/lordicon.js"></script>
+<lord-icon
+    src="https://cdn.lordicon.com/ncmnezgk.json"
+    trigger="loop"
+    delay="2000"
+    colors="primary:#ffffff,secondary:#ffffff"
+    style="width:50px;height:50px">
+</lord-icon>
+  <p id="namePrompt">What's Your Name?</p>
+  <input type="text" id="playerName" placeholder="Enter your name here">
+  <button class="btn" id="enterGameBtn" onclick="saveName()">Enter Game</button>
+</div>
+
+<div class="footer">Created for CSC536 Interactive Learning</div>
+
+<div id="namePopup">⚠️ Please enter your name before starting the game !</div>
+
+<script>
+  function saveName() {
+    const nameInput = document.getElementById("playerName");
+    const name = nameInput.value.trim();      
+    
+    if (!name) {
+        document.getElementById("namePopup").style.display = "block";
+        setTimeout(() => {
+          document.getElementById("namePopup").style.display = "none";
+        }, 2000);
+        return;
+      }
+      
+      localStorage.setItem("playerName", name);
+      localStorage.setItem("triggerConfetti", "yes");
+      localStorage.setItem("playMenuSound", "true");   
+    
+    confetti({
+      particleCount: 100,
+      spread: 70,
+      origin: { y: 0.6 }
+    });
+
+    window.location.href = "menu.html";
+  }
+</script>
+</body>
+</html>

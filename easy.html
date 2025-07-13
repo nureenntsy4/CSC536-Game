@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Flags Ahoy - Easy</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background-image: url('gamebg1.png');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      text-align: center;
+      margin: 0;
+      padding: 0;
+      color: #fff;
+      height: 100vh;
+      overflow: hidden; 
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .level-indicator {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background-color: rgba(255, 255, 255, 0.85);
+      color: #222;
+      padding: 10px 15px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 16px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      z-index: 999;
+    }
+
+    .top-bar-fixed {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+    }
+
+    .btn {
+      padding: 10px 20px;
+      font-family: Poppins, sans-serif;
+      font-size: 16px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      background-color: #1565c0;
+      color: white;
+      transition: background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .btn:hover {
+      background-color: #0d47a1;
+      box-shadow: 0 0 10px rgba(21,101,192,0.6);
+    }
+
+    #settings-menu {
+      display: none;
+      background: #e3f2fd;
+      width: 150px;
+      padding: 10px;
+      margin-top: 10px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.15);
+      flex-direction: column;
+      gap: 10px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    #settings-menu button {
+      padding: 10px 12px;
+      max-width: 150px;
+      font-family: Poppins, sans-serif;
+      font-size: 16px;
+      color:black;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+
+    #settings-menu button:hover {
+      background-color: #817f7d;
+    }
+
+    #settings-menu .pause {
+      background-color: #ff9800; }
+    #settings-menu .exit {
+      background-color: #f44336; }
+
+    .page {
+      max-width: 800px;
+      width: 100%;
+      padding: 30px;
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      color: #333;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .options {
+      display: flex;
+      justify-content: center;
+      gap: 20px;
+      flex-wrap: wrap;
+      margin: 20px 0;
+    }
+
+    .flag, .capital {
+      border: 2px solid #aaa;
+      padding: 10px;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+      cursor: pointer;
+      transition: transform 0.2s, background-color 0.3s, box-shadow 0.3s;
+    }
+
+    .flag:hover, .capital:hover {
+      transform: scale(1.05);
+      background-color: #d0f0ff;
+      box-shadow: 0 0 8px #2196f3;
+    }
+
+    .flag img {
+      width: 150px;
+      height: 90px;
+      object-fit: cover;
+    }
+
+    .selected {
+      border: 3px solid #4CAF50;
+      background-color: #e0ffe0;
+    }
+
+    .wrong-hint {
+      border: 3px dashed #ff0a0a !important;
+      background-color: #f3cdc7 !important;
+    }
+
+    #result, #score, #timer, #lives {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-top: 10px;
+    }
+
+    #hints {
+      font-weight: bold;
+      font-size: 1.2rem;
+      margin-bottom: 5px;
+    }
+
+    .top-bar {
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .top-bar-stats {
+      align-items: flex-start;
+      margin-bottom: -30px;
+    }
+
+    .top-bar-stats > div {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    #hint-btn {
+      font-family: Poppins, sans-serif;
+      font-size: 15px;
+      background-color: transparent;
+      border: 2px dashed grey;
+      color: black;
+      margin-top: 1px;
+      max-width: 150px;
+      padding: 5px;
+    }
+
+    #hint-btn:hover {
+      background-color: rgb(79, 68, 68);
+    }
+
+    #pause-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(100, 100, 100, 0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 999;
+      cursor: pointer;
+    }
+
+    #pause-message {
+      font-size: 2.5rem;
+      font-weight: bold;
+      color: white;
+      background: rgba(0, 0, 0, 0.5);
+      padding: 30px 40px;
+      border-radius: 15px;
+      text-align: center;
+      user-select: none;
+    }
+
+    @keyframes blink-red {
+      0%, 100% { background-color: transparent; }
+      50% { background-color: rgba(255, 0, 0, 0.3); }
+    }
+
+    .blink-warning {
+      animation: blink-red 0.5s ease-in-out;
+      animation-iteration-count: 3;
+    }
+  </style>
+</head>
+<body>
+  <div class="level-indicator">🎯 Level: Easy</div>
+
+  <div class="top-bar-fixed">
+    <button class="btn" onclick="playClickSound(); toggleSettings()">⚙️ Settings</button>
+    <div id="settings-menu">
+      <button class="pause" onclick="playClickSound(); pauseGame()">⏸ Pause</button>
+      <button onclick="playClickSound(); toggleSound()" id="sound-btn">🔊 Sound: ON</button>
+      <input type="range" id="sound-volume" min="0" max="1" step="0.01" value="1" title="Sound Volume" />
+      <button onclick="playClickSound(); toggleMusic()" id="music-btn">🎵 Music: ON</button>
+      <input type="range" id="music-volume" min="0" max="1" step="0.01" value="0.5" title="Music Volume" />
+      <button class="exit" onclick="playClickSound(); exitGame()">❌ Exit</button>
+    </div>
+  </div>
+
+   <div class="page" id="game-container">
+    <div class="top-bar top-bar-stats">
+      <div>
+        <div id="score">Score: 0</div>
+        <button class="btn" id="hint-btn" onclick="playClickSound(); showHint()">💡Hint</button>
+      </div>
+      <div id="timer">Time Left: 50s</div>
+      <div>
+        <div id="lives">Lives: ❤️❤️❤️</div>
+        <div id="hints">Hints: 💡💡</div>
+      </div>
+    </div>
+
+    <h1 id="country-name">Loading...</h1>
+
+    <h3>Select the correct flag:</h3>
+    <div class="options" id="flag-options"></div>
+
+    <h3>Select the capital city:</h3>
+    <div class="options" id="capital-options"></div>
+
+    <div id="pause-overlay" onclick="playClickSound(); resumeGame()">
+      <div id="pause-message">⏸️ Game Paused</div>
+    </div>
+
+    <div id="result"></div>
+  </div>
+
+  <audio id="correct-sound" src="correct.mp3" preload="auto"></audio>
+  <audio id="wrong-sound" src="wrong.mp3" preload="auto"></audio>
+  <audio id="click-sound" src="clickclack.wav" preload="auto"></audio>
+  <audio id="bg-music" src="bgmusic.mp3" preload="auto" loop></audio>
+
+  <script>
+  const levels = shuffle([
+    { country: "Malaysia", code: "my", capital: "Kuala Lumpur" },
+    { country: "Japan", code: "jp", capital: "Tokyo" },
+    { country: "South Korea", code: "kr", capital: "Seoul" },
+    { country: "Thailand", code: "th", capital: "Bangkok" },
+    { country: "Indonesia", code: "id", capital: "Jakarta" },
+    { country: "Philippines", code: "ph", capital: "Manila" },
+    { country: "Singapore", code: "sg", capital: "Singapore" },
+    { country: "Vietnam", code: "vn", capital: "Hanoi" },
+    { country: "India", code: "in", capital: "New Delhi" },
+    { country: "China", code: "cn", capital: "Beijing" },
+    { country: "Bangladesh", code: "bd", capital: "Dhaka" },
+    { country: "Pakistan", code: "pk", capital: "Islamabad" },
+    { country: "Nepal", code: "np", capital: "Kathmandu" },
+    { country: "Sri Lanka", code: "lk", capital: "Sri Jayawardenepura Kotte" },
+    { country: "Saudi Arabia", code: "sa", capital: "Riyadh" },
+    { country: "United Arab Emirates", code: "ae", capital: "Abu Dhabi" },
+    { country: "Brunei", code: "bn", capital: "Bandar Seri Begawan" },
+    { country: "Cambodia", code: "kh", capital: "Phnom Penh" },
+    { country: "Laos", code: "la", capital: "Vientiane" },
+    { country: "Russia", code: "ru", capital: "Moscow" }
+  ]);
+
+  let currentIndex = 0;
+  let selectedFlag = null;
+  let selectedCapital = null;
+  let score = 0;
+  let lives = 3;
+  let timeLeft = 50;
+  let timerInterval = null;
+  let paused = false;
+  let correctAnswers = [];
+  let wrongAnswers = [];
+  let hintCount = 0;
+  const maxHints = 2;
+
+  const correctSound = document.getElementById("correct-sound");
+  const wrongSound = document.getElementById("wrong-sound");
+  const clickSound = document.getElementById("click-sound");
+  const bgMusic = document.getElementById("bg-music");
+
+  let soundEnabled = true;
+  let musicEnabled = true;
+
+  const soundSlider = document.getElementById("sound-volume");
+  const musicSlider = document.getElementById("music-volume");
+
+  // Initial volume
+  bgMusic.volume = 0.5;
+  correctSound.volume = 1;
+  wrongSound.volume = 1;
+  clickSound.volume = 1;
+
+  // Volume slider listeners
+  soundSlider?.addEventListener("input", () => {
+    const vol = parseFloat(soundSlider.value);
+    correctSound.volume = vol;
+    wrongSound.volume = vol;
+    clickSound.volume = vol;
+  });
+
+  musicSlider?.addEventListener("input", () => {
+    bgMusic.volume = parseFloat(musicSlider.value);
+  });
+
+  document.body.addEventListener("click", () => {
+  bgMusic.play().catch(() => {});
+}, { once: true });
+
+  function toggleSound() {
+    soundEnabled = !soundEnabled;
+    correctSound.muted = !soundEnabled;
+    wrongSound.muted = !soundEnabled;
+    clickSound.muted = !soundEnabled;
+    soundSlider.disabled = !soundEnabled;
+    document.getElementById("sound-btn").innerText = soundEnabled ? "🔊 Sound: ON" : "🔇 Sound: OFF";
+  }
+
+  function toggleMusic() {
+    musicEnabled = !musicEnabled;
+    bgMusic.muted = !musicEnabled;
+    musicSlider.disabled = !musicEnabled;
+    document.getElementById("music-btn").innerText = musicEnabled ? "🎵 Music: ON" : "🔕 Music: OFF";
+  }
+
+  function playClickSound() {
+  if (soundEnabled) {
+    clickSound.currentTime = 0;
+    clickSound.play().catch(() => {});
+  }
+}
+
+document.addEventListener("click", () => {
+      bgMusic.play().catch(() => {});
+    }, { once: true });
+
+  function startGame() {
+    startTimer();
+    loadLevel(currentIndex);
+    updateHintButton();
+  }
+
+  function loadLevel(index) {
+    resetSelection();
+    updateUI();
+    updateHintButton();
+
+    const current = levels[index];
+    document.getElementById("country-name").innerText = current.country;
+
+    const flagOptions = shuffle([current, ...getRandomFlags(current.code)]);
+    const capitalOptions = shuffle([current.capital, ...getRandomCapitals(current.capital)]);
+
+    const flagContainer = document.getElementById("flag-options");
+    flagContainer.innerHTML = "";
+    flagOptions.forEach(opt => {
+      const div = document.createElement("div");
+      div.className = "flag";
+      div.innerHTML = `<img src="https://flagcdn.com/w320/${opt.code}.png" alt="${opt.country}">`;
+      div.onclick = () => {
+        if (paused) return;
+        document.querySelectorAll(".flag").forEach(f => f.classList.remove("selected"));
+        div.classList.add("selected");
+        selectedFlag = opt.code;
+        checkMatch();
+      };
+      if (opt.code === current.code) div.dataset.correct = "true";
+      flagContainer.appendChild(div);
+    });
+
+    const capitalContainer = document.getElementById("capital-options");
+    capitalContainer.innerHTML = "";
+    capitalOptions.forEach(c => {
+      const div = document.createElement("div");
+      div.className = "capital";
+      div.innerText = c;
+      div.onclick = () => {
+        if (paused) return;
+        document.querySelectorAll(".capital").forEach(cap => cap.classList.remove("selected"));
+        div.classList.add("selected");
+        selectedCapital = c;
+        checkMatch();
+      };
+      if (c === current.capital) div.dataset.correct = "true";
+      capitalContainer.appendChild(div);
+    });
+  }
+
+  function checkMatch() {
+    if (paused || !selectedFlag || !selectedCapital) return;
+    const current = levels[currentIndex];
+    const isFlagCorrect = selectedFlag === current.code;
+    const isCapitalCorrect = selectedCapital.toLowerCase() === current.capital.toLowerCase();
+    const resultDiv = document.getElementById("result");
+
+    if (isFlagCorrect && isCapitalCorrect) {
+      correctSound.play();
+      score++;
+      correctAnswers.push(current);
+      resultDiv.innerText = "✅ Correct!";
+      setTimeout(nextLevel, 1000);
+    } else {
+      wrongSound.play();
+      lives--;
+      wrongAnswers.push({ ...current, userFlag: selectedFlag, userAnswer: selectedCapital });
+      resultDiv.innerText = "❌ Wrong!";
+      updateUI();
+      if (lives <= 0) {
+        document.body.classList.add("blink-warning");
+        setTimeout(() => {
+          document.body.classList.remove("blink-warning");
+          endGame();
+        }, 1500);
+      } else {
+        setTimeout(nextLevel, 1000);
+      }
+    }
+  }
+
+  function nextLevel() {
+    currentIndex++;
+    if (currentIndex < levels.length) {
+      loadLevel(currentIndex);
+    } else {
+      endGame(true);
+    }
+  }
+
+  function endGame(won = false) {
+    clearInterval(timerInterval);
+    localStorage.setItem("gameSummary", JSON.stringify({ score, lives, timeLeft, correctAnswers, wrongAnswers }));
+    window.location.href = "score.html";
+  }
+
+  function updateUI() {
+    document.getElementById("score").innerText = `Score: ${score}`;
+    document.getElementById("lives").innerText = `Lives: ${"❤️".repeat(lives)}${"🤍".repeat(3 - lives)}`;
+    document.getElementById("timer").innerText = `Time Left: ${timeLeft}s`;
+  }
+
+  function startTimer() {
+    clearInterval(timerInterval);
+    timeLeft = 50;
+    timerInterval = setInterval(() => {
+      if (!paused) {
+        timeLeft--;
+        updateUI();
+        if (timeLeft <= 0) {
+          clearInterval(timerInterval);
+          document.body.classList.add("blink-warning");
+          setTimeout(() => {
+            document.body.classList.remove("blink-warning");
+            endGame();
+          }, 1500);
+        }
+      }
+    }, 1000);
+  }
+
+  function toggleSettings() {
+    const menu = document.getElementById("settings-menu");
+    menu.style.display = menu.style.display === "none" ? "flex" : "none";
+  }
+
+  function pauseGame() {
+    paused = true;
+    document.getElementById("pause-message").innerHTML = `⏸️ Game Paused<br><small>Click anywhere to resume</small>`;
+    document.getElementById("pause-overlay").style.display = "flex";
+  }
+
+  function resumeGame() {
+    document.getElementById("pause-message").innerText = "✅ Resuming...";
+    setTimeout(() => {
+      paused = false;
+      document.getElementById("pause-overlay").style.display = "none";
+      document.getElementById("settings-menu").style.display = "none";
+    }, 500);
+  }
+
+  function exitGame() {
+    if (confirm("Exit game?")) {
+      setTimeout(() => window.location.href = "index.html", 1000);
+    }
+  }
+
+  function showHint() {
+  if (hintCount >= maxHints) {
+    alert("No more hints available!");
+    return;
+  }
+
+  hintCount++;
+  updateHintButton();
+
+  // Clear previous hint styles
+  document.querySelectorAll(".hint-to-remove").forEach(el =>
+    el.classList.remove("hint-to-remove", "wrong-hint")
+  );
+
+  if (hintCount === 1) {
+    // First hint: wrong FLAG
+    const wrongFlags = Array.from(document.querySelectorAll(".flag:not([data-correct='true'])"));
+    if (wrongFlags.length > 0) {
+      const randomWrong = wrongFlags[Math.floor(Math.random() * wrongFlags.length)];
+      randomWrong.classList.add("wrong-hint", "hint-to-remove");
+      setTimeout(() => {
+        randomWrong.remove();
+      }, 1500);
+    }
+  }
+
+  else if (hintCount === 2) {
+    // Second hint: wrong CAPITAL
+    const wrongCapitals = Array.from(document.querySelectorAll(".capital:not([data-correct='true'])"));
+    if (wrongCapitals.length > 0) {
+      const randomWrong = wrongCapitals[Math.floor(Math.random() * wrongCapitals.length)];
+      randomWrong.classList.add("wrong-hint", "hint-to-remove");
+      setTimeout(() => {
+        randomWrong.remove();
+      }, 1500);
+    }
+  }
+}
+
+
+  function updateHintButton() {
+    const hintsLeft = maxHints - hintCount;
+    const hintIcons = "💡".repeat(hintsLeft) + "🚫".repeat(maxHints - hintsLeft);
+    document.getElementById("hints").innerText = `Hints: ${hintIcons}`;
+
+    const btn = document.getElementById("hint-btn");
+    btn.disabled = hintsLeft <= 0;
+    btn.innerText = hintsLeft <= 0 ? "💡 No Hints Left" : "💡 Hint";
+    btn.style.opacity = hintsLeft <= 0 ? 0.5 : 1;
+  }
+
+  function resetSelection() {
+    selectedFlag = null;
+    selectedCapital = null;
+    document.querySelectorAll(".flag").forEach(f => f.classList.remove("selected"));
+    document.querySelectorAll(".capital").forEach(c => c.classList.remove("selected"));
+  }
+
+  function getRandomFlags(exclude) {
+    return shuffle(levels.filter(c => c.code !== exclude)).slice(0, 2);
+  }
+
+  function getRandomCapitals(exclude) {
+    return shuffle(levels.map(c => c.capital).filter(c => c !== exclude)).slice(0, 2);
+  }
+
+  function shuffle(arr) {
+    return [...arr].sort(() => Math.random() - 0.5);
+  }
+
+  window.onload = startGame;
+
+  window.addEventListener("load", function () {
+  if (localStorage.getItem("playLevelSound") === "true") {
+    bgMusic.play().catch(() => {});
+    localStorage.removeItem("playLevelSound");
+  }
+});
+
+</script>
+
+
+</body>
+</html>

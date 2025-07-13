@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Credits - Flags Ahoy!</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background-image: url('credit.jpg');
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      height: 100vh;
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      position: relative;
+    }
+
+    #backBtn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      font-size: 1.2rem;
+      background-color: #ffe3c7;
+      color: #5c4033;
+      border: none;
+      padding: 8px 14px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-family: 'Poppins', sans-serif;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+      transition: background-color 0.3s ease;
+      z-index: 10;
+    }
+
+    #backBtn:hover {
+      background-color: #ffd1a8;
+    }
+
+    .credit-container {
+      width: 40%;
+      margin-right: 60px;
+      background-color: rgba(255, 255, 255, 0.8);
+      padding: 30px;
+      border-radius: 20px;
+      text-align: center;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .credit-title {
+      font-size: 2rem;
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .credit-name {
+  background-color: #fcefdc;
+  margin: 12px 0;
+  padding: 15px 20px;
+  border-radius: 20px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #5c4033;
+  cursor: default;
+  opacity: 0;
+  transform: translateY(-50px);
+  animation: dropIn 0.8s ease-out forwards;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Drop animation delays */
+.credit-name:nth-child(1) { animation-delay: 0.3s; }
+.credit-name:nth-child(2) { animation-delay: 0.6s; }
+.credit-name:nth-child(3) { animation-delay: 0.9s; }
+.credit-name:nth-child(4) { animation-delay: 1.2s; }
+.credit-name:nth-child(5) { animation-delay: 1.5s; }
+
+/* DropIn keyframes */
+@keyframes dropIn {
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+/* Remove float animation completely */
+.credit-name:hover {
+  box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+/* Optional: Keep splash effect */
+.credit-name::after {
+  content: "";
+  position: absolute;
+  width: 10px;
+  height: 10px;
+  background: rgba(173, 216, 230, 0.5);
+  border-radius: 50%;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) scale(1);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.credit-name:hover::after {
+  animation: splash 0.8s ease-out;
+}
+
+@keyframes splash {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: translate(-50%, -50%) scale(6);
+    opacity: 0.3;
+  }
+  100% {
+    transform: translate(-50%, -50%) scale(9);
+    opacity: 0;
+  }
+}
+  </style>
+</head>
+<body>
+  <audio id="open-sound" src="creditbg.mp3" preload="auto"></audio>
+  <button id="backBtn" onclick="goBack()">← Back</button>
+
+  <div class="credit-container">
+    <div class="credit-title">CREATED BY :</div>
+    <div class="credit-list">
+        <div class="credit-name">NUR ERYNA SYAQIRA</div>
+        <div class="credit-name">NUR ALYA</div>
+        <div class="credit-name">NUREEN NATASYA</div>
+        <div class="credit-name">NUR SYUHADAH</div>
+        <div class="credit-name">DALILAH ULFAH</div>
+    </div>
+  </div>
+
+  <script>
+ window.onload = () => {
+    const shouldPlay = sessionStorage.getItem("playCreditSound");
+
+    if (shouldPlay === "true") {
+      const credit = document.getElementById("open-sound");
+      credit.volume = 0.7;
+      credit.play().catch(() => {
+        console.log("Autoplay blocked.");
+      });
+      sessionStorage.removeItem("playCreditSound");
+    }
+  };
+
+  function goBack() {
+    localStorage.setItem("playMenuSound", "true");
+    window.location.href = "menu.html";
+  }
+</script>
+
+</body>
+</html>
